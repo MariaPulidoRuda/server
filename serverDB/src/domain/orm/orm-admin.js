@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 //const { deleteFile } = require('../../middlewares/delete-file');
 
-exports.GetAdmins = async (req, res, next) => {
+exports.GetAdmins = async () => {
     try {
       return await conn.db.connMongo.Admin.find();
     } catch (error) {
@@ -12,6 +12,9 @@ exports.GetAdmins = async (req, res, next) => {
       return await { err: { code: 123, message: error } };
     }
   };
+
+
+ 
 exports.PostAdmin = async (
   AdminName,
   Password,
@@ -19,7 +22,7 @@ exports.PostAdmin = async (
 ) => {
   try {
     const data = await new conn.db.connMongo.Admin({
-      name: AdminName,
+      adminName: AdminName,
       password: Password,
     });
 
@@ -64,19 +67,19 @@ exports.GetById = async (id) => {
   }
 };
 
-exports.AdminByName = async (name) => {
+exports.AdminByName = async (adminname) => {
   try {
-    return await conn.db.connMongo.User.findOne({ name: name });
+    return await conn.db.connMongo.User.findOne({ adminname: adminname });
   } catch (error) {
     magic.LogDanger('Cannot get the admin by its name', error);
     return await { err: { code: 123, message: error } };
   }
 };
 
-exports.Login = async (adminName, req) => {
+exports.Login = async (adminname, req) => {
   try {
     const adminInfo = await conn.db.connMongo.Admin.findOne({
-      adminname: adminName,
+      adminname: adminname,
     });
 
     if (bcrypt.compareSync(req.body.password, adminInfo.password)) {
@@ -84,21 +87,21 @@ exports.Login = async (adminName, req) => {
       const token = jwt.sign(
         {
           id: adminInfo._id,
-          name: adminInfo.name,
+          adminname: adminInfo.adminname,
         
         },
         req.app.get('secretKey'),
-        { expiresIn: '30h' }
+        { expiresIn: '100h' }
       );
       return {
-        user: userInfo,
+        user: adminInfo,
         token: token,
       };
     } else {
       return console.log('Incorrect password');
     }
   } catch (error) {
-    magic.LogDanger('Cannot log in the user', error);
+    magic.LogDanger('Cannot log in the admin', error);
     return await { err: { code: 123, message: error } };
   }
 };

@@ -2,7 +2,7 @@ const magic = require('../../utils/magic');
 const enum_ = require('../../utils/enum');
 const ormAdmin = require('../orm/orm-admin');
 
-exports.Admins = async (req, res) => {
+exports.GetAdmins = async (req, res) => {
   let status = 'Success';
   let errorcode = '';
   let message = '';
@@ -10,7 +10,7 @@ exports.Admins = async (req, res) => {
   let statuscode = 0;
   let response = {};
   try {
-    let respOrm = await ormUser.Admins();
+    let respOrm = await ormAdmin.GetAdmins();
     if (respOrm.err) {
       (status = 'Failure'),
         (errorcode = respOrm.err.code),
@@ -119,7 +119,7 @@ exports.DeleteAdmin = async (req, res) => {
 };
 
 // Update
-exports.PatchAdmin = async (req, res) => {
+exports.UpdateAdmin = async (req, res) => {
   let status = 'Success',
     errorcode = '',
     message = '',
@@ -135,8 +135,8 @@ exports.PatchAdmin = async (req, res) => {
       _id: id,
     };
 
-    if (id && patchedAdmin) {
-      let respOrm = await ormAdmin.PatchAdmin(id, patchedAdmin, req);
+    if (id && updatedAdmin) {
+      let respOrm = await ormAdmin.UpdateAdmin(id, updatedAdmin, req);
       console.log(respOrm);
       if (respOrm.err) {
         (status = 'Failure'),
@@ -148,7 +148,7 @@ exports.PatchAdmin = async (req, res) => {
       }
     } else {
       (status = 'Failure'),
-        (errorcode = enum_.ERROR_REQUIRED_FIELD), //este error no cuadra
+        (errorcode = enum_.ERROR_REQUIRED_FIELD), 
         (message = 'id does not exist'),
         (statuscode = enum_.CODE_UNPROCESSABLE_ENTITY);
     }
